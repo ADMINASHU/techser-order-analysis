@@ -6,7 +6,6 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import styles from "./Profile.module.css";
 import Image from "next/image";
-import DataContext from "@/context/DataContext";
 
 const Profile = ({ LoggedUserID }) => {
   const [profile, setProfile] = useState({});
@@ -26,15 +25,7 @@ const Profile = ({ LoggedUserID }) => {
     userID: "",
     verified: false,
   });
-  const { processedData } = useContext(DataContext);
 
-  const filteredBranches = !formData.region
-    ? Array.from(new Set(processedData.map((row) => row.branch)))
-    : Array.from(
-        new Set(
-          processedData.filter((row) => row.region === formData.region).map((row) => row.branch)
-        )
-      );
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -320,11 +311,7 @@ const Profile = ({ LoggedUserID }) => {
                 disabled={!editMode}
               >
                 <option value="">Select Branch</option>
-                {filteredBranches.map((branch) => (
-                  <option key={branch} value={branch}>
-                    {branch}
-                  </option>
-                ))}
+             
               </select>
             </div>
           </div>

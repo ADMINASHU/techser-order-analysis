@@ -63,48 +63,16 @@ export default function Navbar({ isAuthenticated, loggedUser }) {
             className={styles.logo}
           />
         </Link>
-        {level > 1 && (
-          <Link
-            href="/my-report"
-            className={pathname === "/my-report" ? styles.activeLink : styles.nlink}
-          >
-            My Report
-          </Link>
-        )}
-        <Link
-          href=""
-          className={
-            pathname === "/dashboard/engineer" ||
-            pathname === "/dashboard/branch" ||
-            pathname === "/dashboard/region" ||
-            pathname === "/dashboard/customer"
-              ? styles.activeLink
-              : styles.nlink
-          }
-          onClick={toggleDash}
-        >
-          Dashboard
-        </Link>
+     
+      
 
-        {level <= 1 && (
-          <Link href="/data" className={pathname === "/data" ? styles.activeLink : styles.nlink}>
-            Data
-          </Link>
-        )}
+       
         {level <= 3 && (
           <Link href="/users" className={pathname === "/users" ? styles.activeLink : styles.nlink}>
             Users
           </Link>
         )}
 
-        {level <= 1 && (
-          <Link
-            href="/control"
-            className={pathname === "/control" ? styles.activeLink : styles.nlink}
-          >
-            Control
-          </Link>
-        )}
       </div>
       <div className={styles.profileSection}>
         <Link href="/profile" className={styles.profileContainer}>
@@ -163,70 +131,10 @@ export default function Navbar({ isAuthenticated, loggedUser }) {
           <Link href="/" className={pathname === "/" ? styles.activeLink : ""} onClick={toggleMenu}>
             Home
           </Link>
-          {level > 1 && (
-            <Link
-              href="/my-report"
-              className={pathname === "/my-report" ? styles.activeLink : styles.nlink}
-            >
-              My Report
-            </Link>
-          )}
-          <Link
-            href=""
-            className={
-              pathname === "/dashboard/engineer" ||
-              pathname === "/dashboard/branch" ||
-              pathname === "/dashboard/region" ||
-              pathname === "/dashboard/customer"
-                ? styles.activeLink
-                : styles.nlink
-            }
-            onClick={toggleDash}
-          >
-            Dashboard  ▼
-          </Link>
-          {dashOpen && (
-            <div className={styles.newResponsiveDash}>
-              <Link
-                href="/dashboard/engineer"
-                className={pathname === "/dashboard/engineer" ? styles.activeLink : ""}
-                onClick={toggleMenu}
-              >
-                Engineer
-              </Link>
-              <Link
-                href="/dashboard/branch"
-                className={pathname === "/dashboard/branch" ? styles.activeLink : ""}
-                onClick={toggleMenu}
-              >
-                Branch
-              </Link>
-              <Link
-                href="/dashboard/region"
-                className={pathname === "/dashboard/region" ? styles.activeLink : ""}
-                onClick={toggleMenu}
-              >
-                Region
-              </Link>
-              <Link
-                href="/dashboard/customer"
-                className={pathname === "/dashboard/customer" ? styles.activeLink : ""}
-                onClick={toggleMenu}
-              >
-                Customer
-              </Link>
-            </div>
-          )}
+      
+      
 
-          {level <= 1 && (
-            <Link
-              href="/data"
-              className={pathname === "/data" ? styles.activeLink : ""}
-              onClick={toggleMenu}
-            >
-              Data
-            </Link>
-          )}
+        
 
           {level <= 3 && (
             <Link
@@ -238,52 +146,13 @@ export default function Navbar({ isAuthenticated, loggedUser }) {
             </Link>
           )}
 
-          {level <= 1 && (
-            <Link
-              href="/control"
-              onClick={toggleMenu}
-              className={pathname === "/control" ? styles.activeLink : styles.nlink}
-            >
-              Control
-            </Link>
-          )}
+       
           <div className={styles.logout}>
             <Logout onClick={() => toggleMenu()} />
           </div>
         </div>
       )}
-      {dashOpen && (
-        <div className={styles.responsiveDash}>
-          <Link
-            href="/dashboard/engineer"
-            className={pathname === "/dashboard/engineer" ? styles.activeLink : ""}
-            onClick={toggleDash}
-          >
-            Engineer
-          </Link>
-          <Link
-            href="/dashboard/branch"
-            className={pathname === "/dashboard/branch" ? styles.activeLink : ""}
-            onClick={toggleDash}
-          >
-            Branch
-          </Link>
-          <Link
-            href="/dashboard/region"
-            className={pathname === "/dashboard/region" ? styles.activeLink : ""}
-            onClick={toggleDash}
-          >
-            Region
-          </Link>
-          <Link
-            href="/dashboard/customer"
-            className={pathname === "/dashboard/customer" ? styles.activeLink : ""}
-            onClick={toggleDash}
-          >
-            Customer
-          </Link>
-        </div>
-      )}
+ 
     </nav>
   );
 }
