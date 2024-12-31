@@ -1,10 +1,9 @@
 import localFont from "next/font/local";
 import "./globals.css";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { auth } from "@/auth";
-import { DataProvider } from "../context/DataContext";
+
 
 
 const geistSans = localFont({
@@ -35,7 +34,7 @@ export default async function RootLayout({ children }) {
   const loggedUser = session?.user;
 
   return (
-    <DataProvider>
+   
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} text-sm flex flex-col min-h-screen overflow-x-hidden`}>
           <Navbar isAuthenticated={isAuthenticated} session={session} loggedUser={loggedUser} />
@@ -43,9 +42,8 @@ export default async function RootLayout({ children }) {
             {children}
           </main>
           <Footer  isAuthenticated={isAuthenticated} loggedUser={loggedUser} />
-          <SpeedInsights />
         </body>
       </html>
-    </DataProvider>
+ 
   );
 }

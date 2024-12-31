@@ -7,11 +7,10 @@ import { useRouter } from "next/navigation";
 import styles from "./Navbar.module.css"; // Import CSS module
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import DataContext from "../context/DataContext";
 import Swal from "sweetalert2";
 
 export default function Navbar({ isAuthenticated, loggedUser }) {
-  const { processedData, totalRows, loading } = useContext(DataContext); // Use DataContext to access processedData and loading state
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [dashOpen, setDashOpen] = useState(false);
 
@@ -47,19 +46,12 @@ export default function Navbar({ isAuthenticated, loggedUser }) {
     setDashOpen(!dashOpen);
   };
 
-  // Calculate progress
-  const progress = (processedData.length / totalRows) * 100;
 
   if (!isAuthenticated) {
     return null;
   }
   return (
     <nav className={styles.navbar}>
-      {loading && (
-        <div className={styles.progressBarContainer}>
-          <div className={styles.progressBar} style={{ width: `${progress}%` }}></div>
-        </div>
-      )}
       <div className={styles.navLinks}>
         <Link href="/" className={pathname === "/" ? styles.activeLink : ""}>
           <Image
