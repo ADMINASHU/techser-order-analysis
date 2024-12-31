@@ -1,5 +1,5 @@
 import connectToServiceEaseDB from "../../../lib/serviceDB";
-import { Data } from "../../../models/Data";
+import { Data } from "../../../models/Orders";
 import Point from "../../../models/Point";
 import UserData from "../../../models/UserData";
 import { NextResponse } from "next/server";
