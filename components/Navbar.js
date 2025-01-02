@@ -67,11 +67,14 @@ export default function Navbar({ isAuthenticated, loggedUser }) {
       
 
        
-        {level <= 3 && (
+    
+          <Link href="/dash" className={pathname === "/dash" ? styles.activeLink : styles.nlink}>
+            Dash
+          </Link>
           <Link href="/users" className={pathname === "/users" ? styles.activeLink : styles.nlink}>
             Users
           </Link>
-        )}
+   
 
       </div>
       <div className={styles.profileSection}>
