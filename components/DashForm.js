@@ -224,14 +224,19 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData }) => {
                 <p>
                   <strong>Serial No:</strong> {product.serialNo}
                 </p>
-                <p>
-                  <strong>Rating:</strong> {product.rating}
-                </p>
+                {/* Only show Rating/AH if not RACK or OTHERS */}
+                {!(product.productCategory === "RACK" || product.productCategory === "OTHERS") && (
+                  <p>
+                    <strong>{product.productCategory === "BATTERY" ? "Capacity (AH)" : "Rating (KVA)"}: </strong> 
+                    {product.rating}
+                  </p>
+                )}
                 <p>
                   <strong>Quantity:</strong> {product.quantity}
                 </p>
-
-                {product.productType === "ORDERED" && (
+                {/* Show warranty only for ORDERED products and not for RACK or OTHERS */}
+                {product.productType === "ORDERED" && 
+                !(product.productCategory === "RACK" || product.productCategory === "OTHERS") && (
                   <p>
                     <strong>Warranty:</strong>{" "}
                     {new Date(product.warrantyStartDate).toLocaleDateString()} to{" "}
