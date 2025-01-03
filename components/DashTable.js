@@ -98,9 +98,9 @@ const DashTable = ({ department, level, isAdmin }) => {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+              {orders.map((order, index) => (
                 <tr key={order._id}>
-                  <td>{order.slNo}</td>
+                  <td>{index+1}</td>
                   <td>{order.customerName}</td>
                   <td>{order.customerPoNo}</td>
                   <td>{order.orderFor}</td>

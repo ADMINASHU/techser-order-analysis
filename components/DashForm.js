@@ -8,15 +8,17 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [formData, setFormData] = useState({
-    slNo: "",
     customerName: "",
     branchId: "",
     branchName: "",
     organization: "",
     customerPoNo: "",
     poDate: "",
+    orderValue: "", // New field
     orderFor: "",
     isBuybackAvailable: "",
+    buybackValue: "", // New field
+    warrantyPeriod: "", // New field
     indentNo: "",
     indentDate: "",
     sapCode: "",
@@ -36,21 +38,23 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
     actualDispatchDate: "",
     invoiceNo: "",
     invoiceDate: "",
-    deliveryChallanNo: "",
-    deliveryChallanDate: "",
+    invoiceValue: "", // New field
     transporterDetails: "",
     docketNo: "",
     transporterContactDetails: "",
     plannedDeliveryDate: "",
     actualDeliveryDate: "",
+    deliveryAcknowledgement: "", // New field
     installationPlannedDate: "",
     actualInstallationDate: "",
     installationDoneBy: "",
     serialNo: "",
     installationReportNo: "",
-    buybackReceived: "",
-    buybackReceivedDate: "",
-    receivedBuybackDetailsWithQty: "",
+    buybackCollected: "", // Updated field
+    buybackCollectedDate: "", // Updated field
+    buybackDetailsWithQty: "",
+    buybackSendToHoOrDisposedLocally: "", // New field
+    localDisposalDetails: "", // New field
     paymentStatus: "",
     lastPaymentReceivedDate: "",
     paymentAmount: "",
@@ -63,33 +67,11 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const validateForm = useCallback(() => {
-    const requiredFields = ['customerName', 'customerPoNo', 'orderFor'];
-    const errors = {};
-
-    requiredFields.forEach(field => {
-      if (!formData[field]) {
-        errors[field] = 'This field is required';
-      }
-    });
-
-    if (Object.keys(errors).length > 0) {
-      setError('Please fill in all required fields');
-      return false;
-    }
-    return true;
-  }, [formData]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccessMessage("");
-
-    if (!validateForm()) {
-      setLoading(false);
-      return;
-    }
 
     try {
       const response = await fetch("/api/orders", {
@@ -105,9 +87,10 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
         throw new Error(data.error || "Something went wrong");
       }
 
-      setSuccessMessage(initialData?._id ? "Order updated successfully!" : "Order created successfully!");
+      setSuccessMessage(
+        initialData?._id ? "Order updated successfully!" : "Order created successfully!"
+      );
       setTimeout(() => onClose(), 2000);
-
     } catch (err) {
       setError(err.message);
     } finally {
@@ -131,25 +114,102 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
 
   return (
     <div className={styles.formWrapper}>
-      {error && <div className={styles.error}>{error}</div>}
-      {successMessage && <div className={styles.success}>{successMessage}</div>}
+      {/* {error && <div className={styles.error}>{error}</div>}
+      {successMessage && <div className={styles.success}>{successMessage}</div>} */}
       <form onSubmit={handleSubmit} className={styles.formContainer}>
         <div className={styles.formFields}>
+          {/* Order Details Section */}
+          {canViewSection("orderDetails") && (
+            <>
+              <h3 className={styles.sectionHeader}>Order Details</h3>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Order For</label>
+                <select
+                  name="orderFor"
+                  value={formData.orderFor}
+                  onChange={handleChange}
+                  className={styles.input}
+                >
+                  <option value="">Select</option>
+                  <option value="SYSTEM">SYSTEM</option>
+                  <option value="BATTERY">BATTERY</option>
+                  <option value="SYSTEM & BATTERY">SYSTEM & BATTERY</option>
+                  <option value="RACK">RACK</option>
+                  <option value="OTHERS">OTHERS</option>
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>PO Date</label>
+                <input
+                  type="date"
+                  name="poDate"
+                  value={formData.poDate}
+                  onChange={handleChange}
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Customer PO No</label>
+                <input
+                  type="text"
+                  name="customerPoNo"
+                  value={formData.customerPoNo}
+                  onChange={handleChange}
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Is Buyback Available</label>
+                <select
+                  name="isBuybackAvailable"
+                  value={formData.isBuybackAvailable}
+                  onChange={handleChange}
+                  className={styles.select}
+                >
+                  <option value="">Select</option>
+                  <option value="YES">Yes</option>
+                  <option value="NO">No</option>
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Order Value</label>
+                <input
+                  type="number"
+                  name="orderValue"
+                  value={formData.orderValue}
+                  onChange={handleChange}
+                  className={styles.input}
+                />
+              </div>
+              {formData.isBuybackAvailable === "YES" && (
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Buyback Value</label>
+                  <input
+                    type="number"
+                    name="buybackValue"
+                    value={formData.buybackValue}
+                    onChange={handleChange}
+                    className={styles.input}
+                  />
+                </div>
+              )}
+            </>
+          )}
+
           {/* Customer Information Section */}
           {canViewSection("customerInfo") && (
             <>
               <h3 className={styles.sectionHeader}>Customer Information</h3>
               <div className={styles.formGroup}>
-                <label className={styles.label}>SL No</label>
+                <label className={styles.label}>Organization</label>
                 <input
                   type="text"
-                  name="slNo"
-                  value={formData.slNo}
+                  name="organization"
+                  value={formData.organization}
                   onChange={handleChange}
                   className={styles.input}
                 />
               </div>
-              {/* Restore the rest of the customer info fields */}
               <div className={styles.formGroup}>
                 <label className={styles.label}>Customer Name</label>
                 <input
@@ -180,79 +240,7 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
                   className={styles.input}
                 />
               </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Organization</label>
-                <input
-                  type="text"
-                  name="organization"
-                  value={formData.organization}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Customer PO No</label>
-                <input
-                  type="text"
-                  name="customerPoNo"
-                  value={formData.customerPoNo}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>PO Date</label>
-                <input
-                  type="date"
-                  name="poDate"
-                  value={formData.poDate}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Order For</label>
-                <input
-                  type="text"
-                  name="orderFor"
-                  value={formData.orderFor}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Is Buyback Available</label>
-                <select
-                  name="isBuybackAvailable"
-                  value={formData.isBuybackAvailable}
-                  onChange={handleChange}
-                  className={styles.select}
-                >
-                  <option value="">Select</option>
-                  <option value="YES">Yes</option>
-                  <option value="NO">No</option>
-                </select>
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Indent No</label>
-                <input
-                  type="text"
-                  name="indentNo"
-                  value={formData.indentNo}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Indent Date</label>
-                <input
-                  type="date"
-                  name="indentDate"
-                  value={formData.indentDate}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
+
               <div className={styles.formGroup}>
                 <label className={styles.label}>SAP Code</label>
                 <input
@@ -325,12 +313,20 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
               </div>
             </>
           )}
-
-          {/* Order Details Section */}
-          {canViewSection("orderDetails") && (
+          {/* Product Details Section */}
+          {canViewSection("productDetails") && (
             <>
-              <h3 className={styles.sectionHeader}>Order Details</h3>
-              {/* Restore order details fields */}
+              <h3 className={styles.sectionHeader}>Product Details</h3>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Serial No</label>
+                <input
+                  type="text"
+                  name="serialNo"
+                  value={formData.serialNo}
+                  onChange={handleChange}
+                  className={styles.input}
+                />
+              </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>System Description</label>
                 <input
@@ -371,46 +367,68 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
                   className={styles.input}
                 />
               </div>
+              {formData.isBuybackAvailable === "YES" && (
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Buyback Description</label>
+                  <input
+                    type="text"
+                    name="buybackDescription"
+                    value={formData.buybackDescription}
+                    onChange={handleChange}
+                    className={styles.input}
+                  />
+                </div>
+              )}
+              {formData.isBuybackAvailable === "YES" && (
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Buyback Quantity</label>
+                  <input
+                    type="number"
+                    name="buybackQuantity"
+                    value={formData.buybackQuantity}
+                    onChange={handleChange}
+                    className={styles.input}
+                  />
+                </div>
+              )}
               <div className={styles.formGroup}>
-                <label className={styles.label}>Buyback Description</label>
+                <label className={styles.label}>Warranty Period</label>
                 <input
                   type="text"
-                  name="buybackDescription"
-                  value={formData.buybackDescription}
+                  name="warrantyPeriod"
+                  value={formData.warrantyPeriod}
                   onChange={handleChange}
                   className={styles.input}
                 />
               </div>
+            </>
+          )}
+          {/* Indent and Invoice Information Section */}
+          {canViewSection("IndentInvoiceInfo") && (
+            <>
+              <h3 className={styles.sectionHeader}>Indent and Invoice Information</h3>
+
               <div className={styles.formGroup}>
-                <label className={styles.label}>Buyback Quantity</label>
+                <label className={styles.label}>Indent No</label>
                 <input
-                  type="number"
-                  name="buybackQuantity"
-                  value={formData.buybackQuantity}
+                  type="text"
+                  name="indentNo"
+                  value={formData.indentNo}
                   onChange={handleChange}
                   className={styles.input}
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.label}>Scheduled Dispatch Date</label>
-                <input
-                  type="date"
-                  name="scheduledDispatchDate"
-                  value={formData.scheduledDispatchDate}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Actual Dispatch Date</label>
+                <label className={styles.label}>Indent Date</label>
                 <input
                   type="date"
-                  name="actualDispatchDate"
-                  value={formData.actualDispatchDate}
+                  name="indentDate"
+                  value={formData.indentDate}
                   onChange={handleChange}
                   className={styles.input}
                 />
               </div>
+
               <div className={styles.formGroup}>
                 <label className={styles.label}>Invoice No</label>
                 <input
@@ -447,6 +465,44 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
                   type="date"
                   name="deliveryChallanDate"
                   value={formData.deliveryChallanDate}
+                  onChange={handleChange}
+                  className={styles.input}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Invoice Value</label>
+                <input
+                  type="number"
+                  name="invoiceValue"
+                  value={formData.invoiceValue}
+                  onChange={handleChange}
+                  className={styles.input}
+                />
+              </div>
+            </>
+          )}
+
+          {/* Delivery Information Section */}
+          {canViewSection("deliveryInfo") && (
+            <>
+              <h3 className={styles.sectionHeader}>Delivery Information</h3>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Scheduled Dispatch Date</label>
+                <input
+                  type="date"
+                  name="scheduledDispatchDate"
+                  value={formData.scheduledDispatchDate}
+                  onChange={handleChange}
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Actual Dispatch Date</label>
+                <input
+                  type="date"
+                  name="actualDispatchDate"
+                  value={formData.actualDispatchDate}
                   onChange={handleChange}
                   className={styles.input}
                 />
@@ -501,14 +557,28 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
                   className={styles.input}
                 />
               </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Delivery Acknowledgement</label>
+                <input
+                  type="text"
+                  name="deliveryAcknowledgement"
+                  value={formData.deliveryAcknowledgement}
+                  onChange={handleChange}
+                  className={styles.input}
+                />
+              </div>
             </>
           )}
 
-          {/* Delivery Information Section */}
-          {canViewSection("deliveryInfo") && (
+          {/* Installation Information Section */}
+          {canViewSection("installationInfo") && (
             <>
-              <h3 className={styles.sectionHeader}>Delivery Information</h3>
-              {/* Restore delivery info fields */}
+              <h3 className={styles.sectionHeader}>
+                {formData.isBuybackAvailable === "YES"
+                  ? `Installation and Buyback Information`
+                  : `Installation Information`}
+              </h3>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Installation Planned Date</label>
                 <input
@@ -539,16 +609,7 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
                   className={styles.input}
                 />
               </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Serial No</label>
-                <input
-                  type="text"
-                  name="serialNo"
-                  value={formData.serialNo}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
+
               <div className={styles.formGroup}>
                 <label className={styles.label}>Installation Report No</label>
                 <input
@@ -559,87 +620,81 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
                   className={styles.input}
                 />
               </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Buyback Received</label>
-                <select
-                  name="buybackReceived"
-                  value={formData.buybackReceived}
-                  onChange={handleChange}
-                  className={styles.select}
-                >
-                  <option value="">Select</option>
-                  <option value="YES">Yes</option>
-                  <option value="NO">No</option>
-                </select>
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Buyback Received Date</label>
-                <input
-                  type="date"
-                  name="buybackReceivedDate"
-                  value={formData.buybackReceivedDate}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Received Buyback Details with Qty</label>
-                <input
-                  type="text"
-                  name="receivedBuybackDetailsWithQty"
-                  value={formData.receivedBuybackDetailsWithQty}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-            </>
-          )}
-
-          {/* Installation Information Section */}
-          {canViewSection("installationInfo") && (
-            <>
-              <h3 className={styles.sectionHeader}>Installation Information</h3>
-              {/* Restore installation info fields */}
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Last Payment Received Date</label>
-                <input
-                  type="date"
-                  name="lastPaymentReceivedDate"
-                  value={formData.lastPaymentReceivedDate}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Payment Amount</label>
-                <input
-                  type="number"
-                  name="paymentAmount"
-                  value={formData.paymentAmount}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Payment Details</label>
-                <input
-                  type="text"
-                  name="paymentDetails"
-                  value={formData.paymentDetails}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Remarks</label>
-                <input
-                  type="text"
-                  name="remarks"
-                  value={formData.remarks}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
+              {formData.isBuybackAvailable === "YES" && (
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Buyback Collected</label>
+                  <select
+                    name="buybackCollected"
+                    value={formData.buybackCollected}
+                    onChange={handleChange}
+                    className={styles.select}
+                  >
+                    <option value="">Select</option>
+                    <option value="YES">Yes</option>
+                    <option value="NO">No</option>
+                    <option value="PARTIALLY COLLECTED">Partial</option>
+                  </select>
+                </div>
+              )}
+              {formData.isBuybackAvailable === "YES" &&
+                (formData.buybackCollected === "YES" ||
+                  formData.buybackCollected === "PARTIALLY COLLECTED") && (
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Buyback Collected Date</label>
+                    <input
+                      type="date"
+                      name="buybackCollectedDate"
+                      value={formData.buybackCollectedDate}
+                      onChange={handleChange}
+                      className={styles.input}
+                    />
+                  </div>
+                )}
+              {formData.isBuybackAvailable === "YES" &&
+                (formData.buybackCollected === "YES" ||
+                  formData.buybackCollected === "PARTIALLY COLLECTED") && (
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Received Buyback Details with Qty</label>
+                    <input
+                      type="text"
+                      name="buybackDetailsWithQty"
+                      value={formData.buybackDetailsWithQty}
+                      onChange={handleChange}
+                      className={styles.input}
+                    />
+                  </div>
+                )}
+              {formData.isBuybackAvailable === "YES" &&
+                (formData.buybackCollected === "YES" ||
+                  formData.buybackCollected === "PARTIALLY COLLECTED") && (
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Buyback Send To HO/Disposed Locally</label>
+                    <select
+                      name="buybackSendToHoOrDisposedLocally"
+                      value={formData.buybackSendToHoOrDisposedLocally}
+                      onChange={handleChange}
+                      className={styles.select}
+                    >
+                      <option value="">Select</option>
+                      <option value="SENT_TO_HO">Sent to HO</option>
+                      <option value="DISPOSED_LOCALLY">Disposed Locally</option>
+                    </select>
+                  </div>
+                )}
+              {formData.isBuybackAvailable === "YES" &&
+                (formData.buybackCollected === "YES" ||
+                  formData.buybackCollected === "PARTIALLY COLLECTED") && (
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Local Disposal Details</label>
+                    <input
+                      type="text"
+                      name="localDisposalDetails"
+                      value={formData.localDisposalDetails}
+                      onChange={handleChange}
+                      className={styles.input}
+                    />
+                  </div>
+                )}
             </>
           )}
 
@@ -706,11 +761,11 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
           )}
 
           <div className={styles.buttonContainer}>
-            <button type="submit" className={styles.button} disabled={loading}>
-              {loading ? 'Submitting...' : 'Submit'}
-            </button>
-            <button type="button" className={styles.closeButton} onClick={onClose}>
+            <button type="button" className={(styles.button, styles.closeButton)} onClick={onClose}>
               Cancel
+            </button>
+            <button type="submit" className={styles.button} disabled={loading}>
+              {loading ? "Submitting..." : "Submit"}
             </button>
           </div>
         </div>
