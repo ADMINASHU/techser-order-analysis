@@ -221,28 +221,33 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData }) => {
                 <p>
                   <strong>Category:</strong> {product.productCategory}
                 </p>
-                <p>
-                  <strong>Serial No:</strong> {product.serialNo}
-                </p>
-                {/* Only show Rating/AH if not RACK or OTHERS */}
+
                 {!(product.productCategory === "RACK" || product.productCategory === "OTHERS") && (
-                  <p>
-                    <strong>{product.productCategory === "BATTERY" ? "Capacity (AH)" : "Rating (KVA)"}: </strong> 
-                    {product.rating}
-                  </p>
+                  <>
+                    <p>
+                      <strong>Serial No:</strong> {product.serialNo}
+                    </p>
+
+                    <p>
+                      <strong>
+                        {product.productCategory === "BATTERY" ? "Capacity (AH)" : "Rating (KVA)"}:{" "}
+                      </strong>
+                      {product.rating}
+                    </p>
+                  </>
                 )}
                 <p>
                   <strong>Quantity:</strong> {product.quantity}
                 </p>
                 {/* Show warranty only for ORDERED products and not for RACK or OTHERS */}
-                {product.productType === "ORDERED" && 
-                !(product.productCategory === "RACK" || product.productCategory === "OTHERS") && (
-                  <p>
-                    <strong>Warranty:</strong>{" "}
-                    {new Date(product.warrantyStartDate).toLocaleDateString()} to{" "}
-                    {new Date(product.warrantyEndDate).toLocaleDateString()}
-                  </p>
-                )}
+                {product.productType === "ORDERED" &&
+                  !(product.productCategory === "RACK" || product.productCategory === "OTHERS") && (
+                    <p>
+                      <strong>Warranty:</strong>{" "}
+                      {new Date(product.warrantyStartDate).toLocaleDateString()} to{" "}
+                      {new Date(product.warrantyEndDate).toLocaleDateString()}
+                    </p>
+                  )}
               </div>
               <button
                 type="button"
@@ -299,38 +304,39 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData }) => {
               </select>
             </div>
 
-            <div className={styles.formGroup}>
-              <label>Serial No</label>
-              <input
-                type="text"
-                value={productForm.serialNo}
-                onChange={(e) =>
-                  setProductForm((prev) => ({
-                    ...prev,
-                    serialNo: e.target.value,
-                  }))
-                }
-              />
-            </div>
-
             {!(
               productForm.productCategory === "RACK" || productForm.productCategory === "OTHERS"
             ) && (
-              <div className={styles.formGroup}>
-                <label>
-                  {productForm.productCategory === "BATTERY" ? "Capacity (AH)" : "Rating (KVA)"}
-                </label>
-                <input
-                  type="text"
-                  value={productForm.rating}
-                  onChange={(e) =>
-                    setProductForm((prev) => ({
-                      ...prev,
-                      rating: e.target.value,
-                    }))
-                  }
-                />
-              </div>
+              <>
+                <div className={styles.formGroup}>
+                  <label>Serial No</label>
+                  <input
+                    type="text"
+                    value={productForm.serialNo}
+                    onChange={(e) =>
+                      setProductForm((prev) => ({
+                        ...prev,
+                        serialNo: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>
+                    {productForm.productCategory === "BATTERY" ? "Capacity (AH)" : "Rating (KVA)"}
+                  </label>
+                  <input
+                    type="text"
+                    value={productForm.rating}
+                    onChange={(e) =>
+                      setProductForm((prev) => ({
+                        ...prev,
+                        rating: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </>
             )}
 
             <div className={styles.formGroup}>

@@ -35,7 +35,7 @@ const DashView = ({ initialData, onClose }) => {
     {
       title: "Product Details",
       isProductSection: true, // Add this flag for special handling
-      fields: [] // We'll handle products separately
+      fields: [], // We'll handle products separately
     },
     {
       title: "Indent and Invoice Information",
@@ -100,18 +100,48 @@ const DashView = ({ initialData, onClose }) => {
     }
   };
 
-  // Add new function to render products
+  // Add new function to render products with conditional logic
   const renderProducts = () => (
     <div className={styles.productsGrid}>
       {initialData.products?.map((product, index) => (
         <div key={index} className={styles.productCard}>
           <h4>Product {index + 1}</h4>
-          <p><strong>Type:</strong> {product.productType}</p>
-          <p><strong>Category:</strong> {product.productCategory}</p>
-          <p><strong>Serial No:</strong> {product.serialNo}</p>
-          <p><strong>Rating:</strong> {product.rating}</p>
-          <p><strong>Quantity:</strong> {product.quantity}</p>
-          <p><strong>Warranty Period:</strong> {new Date(product.warrantyStartDate).toLocaleDateString()} to {new Date(product.warrantyEndDate).toLocaleDateString()}</p>
+          <p>
+            <strong>Type:</strong> {product.productType}
+          </p>
+          <p>
+            <strong>Category:</strong> {product.productCategory}
+          </p>
+
+          {/* Only show Rating/AH if not RACK or OTHERS */}
+          {!(product.productCategory === "RACK" || product.productCategory === "OTHERS") && (
+            <>
+              <p>
+                <strong>Serial No:</strong> {product.serialNo}
+              </p>
+
+              <p>
+                <strong>
+                  {product.productCategory === "BATTERY" ? "Capacity (AH)" : "Rating (KVA)"}:
+                </strong>{" "}
+                {product.rating}
+              </p>
+            </>
+          )}
+
+          <p>
+            <strong>Quantity:</strong> {product.quantity}
+          </p>
+
+          {/* Show warranty only for ORDERED products and not for RACK or OTHERS */}
+          {product.productType === "ORDERED" &&
+            !(product.productCategory === "RACK" || product.productCategory === "OTHERS") && (
+              <p>
+                <strong>Warranty Period:</strong>{" "}
+                {new Date(product.warrantyStartDate).toLocaleDateString()} to{" "}
+                {new Date(product.warrantyEndDate).toLocaleDateString()}
+              </p>
+            )}
         </div>
       ))}
     </div>
