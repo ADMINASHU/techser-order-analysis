@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import DashForm from './DashForm';
 import styles from './DashTable.module.css';
+import DashView from './DashView';
 
 const DashTable = ({ department, level, isAdmin }) => {
   const [orders, setOrders] = useState([]);
@@ -104,9 +105,9 @@ const DashTable = ({ department, level, isAdmin }) => {
             </thead>
             <tbody>
               {orders.map((order, index) => (
-                <tr key={order._id}  onClick={() => handleView(order)}>
+                <tr key={order._id}  >
                   <td>{index+1}</td>
-                  <td>{order.customerName}</td>
+                  <td onClick={() => handleView(order)}>{order.customerName}</td>
                   <td>{order.customerPoNo}</td>
                   <td>{order.orderFor}</td>
                   <td>{order.paymentStatus}</td>
