@@ -51,11 +51,6 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData }) => {
     buybackDetailsWithQty: "",
     buybackSendToHoOrDisposedLocally: "", // New field
     localDisposalDetails: "", // New field
-    paymentStatus: "",
-    lastPaymentReceivedDate: "",
-    paymentAmount: "",
-    paymentDetails: "",
-    remarks: "",
     products: [], // Initialize as empty array
     payments: [], // Initialize as empty array for payments
   });
@@ -359,7 +354,9 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData }) => {
             </>
           )}
           {/* Product Details Section */}
-          {canViewSection("productDetails") && <ProductDetails formData={formData} setFormData={setFormData} />}
+          {canViewSection("productDetails") && (
+            <ProductDetails formData={formData} setFormData={setFormData} />
+          )}
           {/* Indent and Invoice Information Section */}
           {canViewSection("IndentInvoiceInfo") && (
             <>

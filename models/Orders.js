@@ -17,6 +17,14 @@ const ProductSchema = new mongoose.Schema({
   warrantyEndDate: Date,
 });
 
+const PaymentSchema = new mongoose.Schema({
+  paymentDate: { type: Date },
+  paymentAmount: { type: Number },
+  paymentDetails: { type: String },
+  paymentStatus: { type: String, enum: ["PENDING", "COMPLETED", "FAILED"] },
+  remarks: { type: String },
+});
+
 const OrderSchema = new mongoose.Schema({
   customerName: String,
   branchId: String,
@@ -38,7 +46,6 @@ const OrderSchema = new mongoose.Schema({
   pinCode: String,
   siteContactName: String,
   siteContactNumber: String,
-  // Removed redundant product fields
   scheduledDispatchDate: Date,
   actualDispatchDate: Date,
   invoiceNo: String,
@@ -60,11 +67,6 @@ const OrderSchema = new mongoose.Schema({
   buybackDetailsWithQty: String,
   buybackSendToHoOrDisposedLocally: { type: String, enum: ["SENT_TO_HO", "DISPOSED_LOCALLY", ""] },
   localDisposalDetails: String,
-  paymentStatus: { type: String, enum: ["COMPLETED", "PENDING", "PARTIAL RECEIVED", ""] },
-  lastPaymentReceivedDate: Date,
-  paymentAmount: Number,
-  paymentDetails: String,
-  remarks: String,
   createdBy: String,
   createdAt: { type: Date, default: Date.now },
   updatedBy: String,
@@ -72,6 +74,9 @@ const OrderSchema = new mongoose.Schema({
 
   // Products array
   products: [ProductSchema],
+
+  // Payments array
+  payments: [PaymentSchema],
 });
 
 // Add timestamps for created and updated
