@@ -48,7 +48,7 @@ const PaymentDetails = ({ formData, setFormData }) => {
         onClick={() => setShowForm(!showForm)}
         className={styles.addButton}
       >
-        {showForm ? "Cancel" : "Add Payment"}
+        <span>+</span> Add Payment
       </button>
 
       {showForm && (
@@ -108,9 +108,18 @@ const PaymentDetails = ({ formData, setFormData }) => {
                 className={styles.input}
               />
             </div>
-            <button type="button" onClick={addPayment} className={styles.addButton}>
-              Save Payment
-            </button>
+            <div className={styles.paymentFormButtons}>
+              <button
+                type="button"
+                onClick={() => setShowForm(false)}
+                className={styles.cancelButton}
+              >
+                Cancel
+              </button>
+              <button type="button" onClick={addPayment} className={styles.saveButton}>
+                Save Payment
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -118,17 +127,29 @@ const PaymentDetails = ({ formData, setFormData }) => {
       <div className={styles.paymentsList}>
         {formData.payments.map((pay, index) => (
           <div key={index} className={styles.paymentItem}>
-            <span>{pay.paymentDate}</span>
-            <span>{pay.paymentAmount}</span>
-            <span>{pay.paymentDetails}</span>
-            <span>{pay.paymentStatus}</span>
-            <span>{pay.remarks}</span>
+            <div className={styles.paymentInfo}>
+              <p>
+                <strong>Date:</strong> {pay.paymentDate}
+              </p>
+              <p>
+                <strong>Amount:</strong> {pay.paymentAmount}
+              </p>
+              <p>
+                <strong>Details:</strong> {pay.paymentDetails}
+              </p>
+              <p>
+                <strong>Status:</strong> {pay.paymentStatus}
+              </p>
+              <p>
+                <strong>Remarks:</strong> {pay.remarks}
+              </p>
+            </div>
             <button
               type="button"
               onClick={() => removePayment(index)}
               className={styles.removeButton}
             >
-              Remove
+              ×
             </button>
           </div>
         ))}

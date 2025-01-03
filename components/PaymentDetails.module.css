@@ -20,39 +20,97 @@
 }
 
 .addButton {
-  margin-top: 10px;
-  padding: 10px 15px;
-  background-color: #0070f3;
+  background-color: #3b82f6;
   color: white;
+  padding: 8px 16px;
   border: none;
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: 500;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.addButton:hover {
+  background-color: #2563eb;
 }
 
 .paymentsList {
-  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .paymentItem {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  position: relative;
   display: flex;
   justify-content: space-between;
-  padding: 10px;
-  border: 1px solid #ddd;
-  margin-bottom: 10px;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 12px;
+}
+
+.paymentItem:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.paymentInfo p {
+  margin: 6px 0;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.paymentInfo strong {
+  color: #374151;
+  font-weight: 500;
+  margin-right: 4px;
 }
 
 .removeButton {
-  background-color: #ff0000;
-  color: white;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #fee2e2;
+  color: #dc2626;
   border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.removeButton:hover {
+  background: #fecaca;
+  transform: scale(1.1);
 }
 
 .paymentForm {
   background-color: #f9f9f9;
-  padding: 20px;
+  padding: 32px;
   border: 1px solid #ddd;
-  border-radius: 5px;
+  border-radius: 12px;
   margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 .paymentFormOverlay {
@@ -66,4 +124,102 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
+}
+
+.paymentForm h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.paymentForm .formGroup {
+  margin-bottom: 16px;
+}
+
+.paymentForm label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 6px;
+}
+
+.paymentForm input,
+.paymentForm select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.paymentForm input:focus,
+.paymentForm select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.paymentForm input:disabled,
+.paymentForm select:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.paymentFormButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.cancelButton {
+  background: #f3f4f6;
+  color: #4b5563;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelButton:hover {
+  background: #e5e7eb;
+}
+
+.saveButton {
+  background: #3b82f6;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.saveButton:hover {
+  background: #2563eb;
+}
+
+@media (min-width: 768px) {
+  .paymentForm {
+    flex-direction: row;
+  }
+
+  .formGroup {
+    flex: 1 1 45%;
+    margin-right: 10px;
+  }
+
+  .formGroup:nth-child(2n) {
+    margin-right: 0;
+  }
 }
