@@ -15,7 +15,7 @@ const DashPage = async() => {
 
   return (
     <div className={styles.dashboardContainer}>
-      <h1 className={styles.pageTitle}>Orders Dashboard</h1>
+      {/* <h1 className={styles.pageTitle}>Orders Dashboard</h1> */}
       <DashTable 
         department={department} 
         level={level} 
