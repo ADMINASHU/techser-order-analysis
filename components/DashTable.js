@@ -8,6 +8,7 @@ const DashTable = ({ department, level, isAdmin }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [showView, setShowView] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
@@ -40,6 +41,10 @@ const DashTable = ({ department, level, isAdmin }) => {
   const handleEdit = (order) => {
     setSelectedOrder(order);
     setShowForm(true);
+  };
+  const handleView = (order) => {
+    setSelectedOrder(order);
+    setShowView(true);
   };
 
   const handleDelete = async (id) => {
@@ -99,7 +104,7 @@ const DashTable = ({ department, level, isAdmin }) => {
             </thead>
             <tbody>
               {orders.map((order, index) => (
-                <tr key={order._id}>
+                <tr key={order._id}  onClick={() => handleView(order)}>
                   <td>{index+1}</td>
                   <td>{order.customerName}</td>
                   <td>{order.customerPoNo}</td>
@@ -141,6 +146,23 @@ const DashTable = ({ department, level, isAdmin }) => {
           />
         </div>
       )}
+
+      {showView && (
+        <div className={styles.formOverlay}>
+          <DashView
+            department={department}
+            level={level}
+            isAdmin={isAdmin}
+            initialData={selectedOrder}
+            onClose={() => {
+              setShowView(false);
+              setSelectedOrder(null);
+              fetchOrders();
+            }}
+          />
+        </div>
+      )}
+      
     </div>
   );
 };

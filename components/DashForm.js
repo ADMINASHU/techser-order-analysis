@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react"; // Add useEffect
 import styles from "./DashForm.module.css";
 
 const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => {
@@ -61,6 +61,35 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
     paymentDetails: "",
     remarks: "",
   });
+
+  // Modified useEffect to handle null values
+  useEffect(() => {
+    if (initialData && Object.keys(initialData).length > 0) {
+      const formattedData = Object.keys(initialData).reduce((acc, key) => {
+        if (initialData[key] === null || initialData[key] === undefined) {
+          // Handle null/undefined values
+          if (typeof formData[key] === 'number') {
+            acc[key] = '';  // For number inputs
+          } else {
+            acc[key] = '';  // For text/date inputs
+          }
+        } else if (initialData[key] instanceof Date || key.toLowerCase().includes('date')) {
+          // Handle date fields
+          const dateValue = initialData[key] ? new Date(initialData[key]) : null;
+          acc[key] = dateValue ? dateValue.toISOString().split('T')[0] : '';
+        } else {
+          // Handle all other fields
+          acc[key] = initialData[key].toString();
+        }
+        return acc;
+      }, {});
+
+      setFormData(prev => ({
+        ...prev,
+        ...formattedData
+      }));
+    }
+  }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
