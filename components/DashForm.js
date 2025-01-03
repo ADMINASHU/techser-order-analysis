@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import styles from "./DashForm.module.css";
 import ProductDetails from "./ProductDetails";
+import PaymentDetails from "./PaymentDetails";
 
 const DashForm = ({ department, level, isAdmin, onClose, initialData }) => {
   const [loading, setLoading] = useState(false);
@@ -56,6 +57,7 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData }) => {
     paymentDetails: "",
     remarks: "",
     products: [], // Initialize as empty array
+    payments: [], // Initialize as empty array for payments
   });
 
   // Modified useEffect to safely handle initialData
@@ -64,6 +66,9 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData }) => {
       const formattedData = Object.keys(initialData).reduce((acc, key) => {
         if (key === "products") {
           // Safely handle products array
+          acc[key] = Array.isArray(initialData[key]) ? initialData[key] : [];
+        } else if (key === "payments") {
+          // Safely handle payments array
           acc[key] = Array.isArray(initialData[key]) ? initialData[key] : [];
         } else if (initialData[key] === null || initialData[key] === undefined) {
           // Handle null/undefined values
@@ -654,61 +659,7 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData }) => {
           {canViewSection("paymentInfo") && (
             <>
               <h3 className={styles.sectionHeader}>Payment Information</h3>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Payment Status</label>
-                <select
-                  name="paymentStatus"
-                  value={formData.paymentStatus}
-                  onChange={handleChange}
-                  className={styles.select}
-                >
-                  <option value="">Select</option>
-                  <option value="COMPLETED">Completed</option>
-                  <option value="PENDING">Pending</option>
-                  <option value="PARTIAL RECEIVED">Partial Received</option>
-                </select>
-              </div>
-              {/* Restore other payment fields */}
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Last Payment Received Date</label>
-                <input
-                  type="date"
-                  name="lastPaymentReceivedDate"
-                  value={formData.lastPaymentReceivedDate}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Payment Amount</label>
-                <input
-                  type="number"
-                  name="paymentAmount"
-                  value={formData.paymentAmount}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Payment Details</label>
-                <input
-                  type="text"
-                  name="paymentDetails"
-                  value={formData.paymentDetails}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Remarks</label>
-                <input
-                  type="text"
-                  name="remarks"
-                  value={formData.remarks}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
+              <PaymentDetails formData={formData} setFormData={setFormData} />
             </>
           )}
 
