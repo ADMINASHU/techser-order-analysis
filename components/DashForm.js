@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from "react"; // Add useEffect
 import styles from "./DashForm.module.css";
 
-const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => {
+const DashForm = ({ department, level, isAdmin, onClose, initialData }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
@@ -28,12 +28,6 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
     pinCode: "",
     siteContactName: "",
     siteContactNumber: "",
-    systemDescription: "",
-    systemQuantity: "",
-    batteryDescription: "",
-    batteryQuantity: "",
-    buybackDescription: "",
-    buybackQuantity: "",
     scheduledDispatchDate: "",
     actualDispatchDate: "",
     invoiceNo: "",
@@ -60,23 +54,69 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
     paymentAmount: "",
     paymentDetails: "",
     remarks: "",
+    products: [], // Initialize as empty array
   });
 
-  // Modified useEffect to handle null values
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [productForm, setProductForm] = useState({
+    productType: "",
+    productCategory: "",
+    serialNo: "",
+    rating: "",
+    quantity: "",
+    warrantyStartDate: "",
+    warrantyEndDate: "",
+  });
+
+  const handleAddProduct = () => {
+  
+
+    setFormData(prev => ({
+      ...prev,
+      products: [...prev.products, {
+        ...productForm,
+        // Add any additional product metadata
+        addedAt: new Date(),
+      }]
+    }));
+
+    // Reset product form
+    setProductForm({
+      productType: "",
+      productCategory: "",
+      serialNo: "",
+      rating: "",
+      quantity: "",
+      warrantyStartDate: "",
+      warrantyEndDate: "",
+    });
+    setShowProductForm(false);
+  };
+
+  const handleRemoveProduct = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      products: prev.products.filter((_, i) => i !== index),
+    }));
+  };
+
+  // Modified useEffect to safely handle initialData
   useEffect(() => {
     if (initialData && Object.keys(initialData).length > 0) {
       const formattedData = Object.keys(initialData).reduce((acc, key) => {
-        if (initialData[key] === null || initialData[key] === undefined) {
+        if (key === 'products') {
+          // Safely handle products array
+          acc[key] = Array.isArray(initialData[key]) ? initialData[key] : [];
+        } else if (initialData[key] === null || initialData[key] === undefined) {
           // Handle null/undefined values
-          if (typeof formData[key] === 'number') {
-            acc[key] = '';  // For number inputs
-          } else {
-            acc[key] = '';  // For text/date inputs
-          }
-        } else if (initialData[key] instanceof Date || key.toLowerCase().includes('date')) {
+          acc[key] = '';
+        } else if (key.toLowerCase().includes('date') && initialData[key]) {
           // Handle date fields
-          const dateValue = initialData[key] ? new Date(initialData[key]) : null;
-          acc[key] = dateValue ? dateValue.toISOString().split('T')[0] : '';
+          try {
+            acc[key] = new Date(initialData[key]).toISOString().split('T')[0];
+          } catch (e) {
+            acc[key] = '';
+          }
         } else {
           // Handle all other fields
           acc[key] = initialData[key].toString();
@@ -102,13 +142,26 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
     setError(null);
     setSuccessMessage("");
 
+    // Validate products if needed
+    if (formData.products.length === 0) {
+      setError("Please add at least one product");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch("/api/orders", {
         method: initialData?._id ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(initialData?._id ? { ...formData, id: initialData._id } : formData),
+        body: JSON.stringify({
+          ...formData,
+          id: initialData?._id,
+          // Include any additional metadata if needed
+          updatedAt: new Date(),
+          updatedBy: "current_user", // Replace with actual user info
+        }),
       });
 
       if (!response.ok) {
@@ -140,6 +193,192 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
 
     return permissions[section]?.includes(department);
   };
+
+  const renderProductDetails = () => (
+    <div className={styles.productSection}>
+      <div className={styles.productHeader}>
+        <div className={styles.sectionTitle}>Product Details</div>
+        <button
+          type="button"
+          onClick={() => setShowProductForm(true)}
+          className={styles.addProductBtn}
+        >
+          <span>+</span> Add Product
+        </button>
+      </div>
+
+      {formData.products.length === 0 ? (
+        <div className={styles.emptyState}>No products added yet</div>
+      ) : (
+        <div className={styles.productsList}>
+          {formData.products.map((product, index) => (
+            <div key={index} className={styles.productCard}>
+              <div className={styles.productInfo}>
+                <p>
+                  <strong>Type:</strong> {product.productType}
+                </p>
+                <p>
+                  <strong>Category:</strong> {product.productCategory}
+                </p>
+                <p>
+                  <strong>Serial No:</strong> {product.serialNo}
+                </p>
+                <p>
+                  <strong>Rating:</strong> {product.rating}
+                </p>
+                <p>
+                  <strong>Quantity:</strong> {product.quantity}
+                </p>
+
+                <p>
+                  <strong>Warranty:</strong>{" "}
+                  {new Date(product.warrantyStartDate).toLocaleDateString()} to{" "}
+                  {new Date(product.warrantyEndDate).toLocaleDateString()}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleRemoveProduct(index)}
+                className={styles.removeProductBtn}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Product Form Modal */}
+      {showProductForm && (
+        <div className={styles.productFormOverlay}>
+          <div className={styles.productForm}>
+            <h4>Add Product Details</h4>
+            <div className={styles.formGroup}>
+              <label>Product Type</label>
+              <select
+                value={productForm.productType}
+                onChange={(e) =>
+                  setProductForm((prev) => ({
+                    ...prev,
+                    productType: e.target.value,
+                  }))
+                }
+              >
+                <option value="">Select Type</option>
+                <option value="ORDERED">Ordered</option>
+                <option value="BUYBACK">Buyback</option>
+              </select>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Product Category</label>
+              <select
+                value={productForm.productCategory}
+                onChange={(e) =>
+                  setProductForm((prev) => ({
+                    ...prev,
+                    productCategory: e.target.value,
+                  }))
+                }
+              >
+                <option value="">Select Category</option>
+                <option value="UPS">UPS</option>
+                <option value="BATTERY">Battery</option>
+                <option value="RACK">Rack</option>
+                <option value="INVERTER">Inverter</option>
+                <option value="SERVO">Servo</option>
+                <option value="OTHERS">Others</option>
+              </select>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Serial No</label>
+              <input
+                type="text"
+                value={productForm.serialNo}
+                onChange={(e) =>
+                  setProductForm((prev) => ({
+                    ...prev,
+                    serialNo: e.target.value,
+                  }))
+                }
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Rating/AH</label>
+              <input
+                type="text"
+                value={productForm.rating}
+                onChange={(e) =>
+                  setProductForm((prev) => ({
+                    ...prev,
+                    rating: e.target.value,
+                  }))
+                }
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Quantity</label>
+              <input
+                type="number"
+                value={productForm.quantity}
+                onChange={(e) =>
+                  setProductForm((prev) => ({
+                    ...prev,
+                    quantity: e.target.value,
+                  }))
+                }
+              />
+            </div>
+          
+                <div className={styles.formGroup}>
+                  <label>Warranty Start Date</label>
+                  <input
+                    type="date"
+                    value={productForm.warrantyStartDate}
+                    onChange={(e) =>
+                      setProductForm((prev) => ({
+                        ...prev,
+                        warrantyStartDate: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>Warranty End Date</label>
+                  <input
+                    type="date"
+                    value={productForm.warrantyEndDate}
+                    onChange={(e) =>
+                      setProductForm((prev) => ({
+                        ...prev,
+                        warrantyEndDate: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+         
+
+            <div className={styles.productFormButtons}>
+              <button
+                type="button"
+                onClick={() => setShowProductForm(false)}
+                className={styles.cancelBtn}
+              >
+                Cancel
+              </button>
+              <button type="button" onClick={handleAddProduct} className={styles.saveBtn}>
+                Add Product
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className={styles.formWrapper}>
@@ -343,95 +582,7 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData = {} }) => 
             </>
           )}
           {/* Product Details Section */}
-          {canViewSection("productDetails") && (
-            <>
-              <h3 className={styles.sectionHeader}>Product Details</h3>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Serial No</label>
-                <input
-                  type="text"
-                  name="serialNo"
-                  value={formData.serialNo}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>System Description</label>
-                <input
-                  type="text"
-                  name="systemDescription"
-                  value={formData.systemDescription}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>System Quantity</label>
-                <input
-                  type="number"
-                  name="systemQuantity"
-                  value={formData.systemQuantity}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Battery Description</label>
-                <input
-                  type="text"
-                  name="batteryDescription"
-                  value={formData.batteryDescription}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Battery Quantity</label>
-                <input
-                  type="number"
-                  name="batteryQuantity"
-                  value={formData.batteryQuantity}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-              {formData.isBuybackAvailable === "YES" && (
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Buyback Description</label>
-                  <input
-                    type="text"
-                    name="buybackDescription"
-                    value={formData.buybackDescription}
-                    onChange={handleChange}
-                    className={styles.input}
-                  />
-                </div>
-              )}
-              {formData.isBuybackAvailable === "YES" && (
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Buyback Quantity</label>
-                  <input
-                    type="number"
-                    name="buybackQuantity"
-                    value={formData.buybackQuantity}
-                    onChange={handleChange}
-                    className={styles.input}
-                  />
-                </div>
-              )}
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Warranty Period</label>
-                <input
-                  type="text"
-                  name="warrantyPeriod"
-                  value={formData.warrantyPeriod}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </div>
-            </>
-          )}
+          {canViewSection("productDetails") && renderProductDetails()}
           {/* Indent and Invoice Information Section */}
           {canViewSection("IndentInvoiceInfo") && (
             <>

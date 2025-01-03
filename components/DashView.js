@@ -34,15 +34,8 @@ const DashView = ({ initialData, onClose }) => {
     },
     {
       title: "Product Details",
-      fields: [
-        { label: "Serial No", key: "serialNo" },
-        { label: "System Description", key: "systemDescription" },
-        { label: "System Quantity", key: "systemQuantity" },
-        { label: "Battery Description", key: "batteryDescription" },
-        { label: "Battery Quantity", key: "batteryQuantity" },
-        { label: "Buyback Description", key: "buybackDescription" },
-        { label: "Buyback Quantity", key: "buybackQuantity" },
-      ],
+      isProductSection: true, // Add this flag for special handling
+      fields: [] // We'll handle products separately
     },
     {
       title: "Indent and Invoice Information",
@@ -107,6 +100,23 @@ const DashView = ({ initialData, onClose }) => {
     }
   };
 
+  // Add new function to render products
+  const renderProducts = () => (
+    <div className={styles.productsGrid}>
+      {initialData.products?.map((product, index) => (
+        <div key={index} className={styles.productCard}>
+          <h4>Product {index + 1}</h4>
+          <p><strong>Type:</strong> {product.productType}</p>
+          <p><strong>Category:</strong> {product.productCategory}</p>
+          <p><strong>Serial No:</strong> {product.serialNo}</p>
+          <p><strong>Rating:</strong> {product.rating}</p>
+          <p><strong>Quantity:</strong> {product.quantity}</p>
+          <p><strong>Warranty Period:</strong> {new Date(product.warrantyStartDate).toLocaleDateString()} to {new Date(product.warrantyEndDate).toLocaleDateString()}</p>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className={styles.viewWrapper}>
       <div className={styles.viewContainer}>
@@ -127,16 +137,20 @@ const DashView = ({ initialData, onClose }) => {
           {sections.map((section) => (
             <div key={section.title} className={styles.section}>
               <h3 className={styles.sectionTitle}>{section.title}</h3>
-              <div className={styles.grid}>
-                {section.fields.map((field) => (
-                  <div key={field.key} className={styles.field}>
-                    <label className={styles.label}>{field.label}</label>
-                    <div className={styles.value}>
-                      {formatValue(initialData[field.key], field.type)}
+              {section.isProductSection ? (
+                renderProducts()
+              ) : (
+                <div className={styles.grid}>
+                  {section.fields.map((field) => (
+                    <div key={field.key} className={styles.field}>
+                      <label className={styles.label}>{field.label}</label>
+                      <div className={styles.value}>
+                        {formatValue(initialData[field.key], field.type)}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>

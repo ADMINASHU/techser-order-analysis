@@ -1,6 +1,22 @@
 // app/models/Data.js
 import mongoose from "mongoose";
 
+const ProductSchema = new mongoose.Schema({
+  productType: { 
+    type: String, 
+    enum: ["ORDERED", "BUYBACK"] 
+  },
+  productCategory: { 
+    type: String, 
+    enum: ["UPS", "BATTERY", "RACK", "INVERTER", "SERVO", "OTHERS"] 
+  },
+  serialNo: String,
+  rating: String,
+  quantity: Number,
+  warrantyStartDate: Date,
+  warrantyEndDate: Date,
+});
+
 const OrderSchema = new mongoose.Schema({
   customerName: String,
   branchId: String,
@@ -8,11 +24,11 @@ const OrderSchema = new mongoose.Schema({
   organization: String,
   customerPoNo: String,
   poDate: { type: Date },
-  orderValue: { type: Number }, // New field
+  orderValue: { type: Number },
   orderFor: { type: String, enum: ["SYSTEM", "BATTERY", "SYSTEM & BATTERY", "RACK", "OTHERS"] },
   isBuybackAvailable: { type: String, enum: ["YES", "NO", ""] },
-  buybackValue: { type: Number }, // New field
-  warrantyPeriod: { type: String }, // New field
+  buybackValue: { type: Number },
+  warrantyPeriod: { type: String },
   indentNo: String,
   indentDate: Date,
   sapCode: String,
@@ -22,33 +38,28 @@ const OrderSchema = new mongoose.Schema({
   pinCode: String,
   siteContactName: String,
   siteContactNumber: String,
-  systemDescription: String,
-  systemQuantity: Number,
-  batteryDescription: String,
-  batteryQuantity: Number,
-  buybackDescription: String,
-  buybackQuantity: Number,
+  // Removed redundant product fields
   scheduledDispatchDate: Date,
   actualDispatchDate: Date,
   invoiceNo: String,
   invoiceDate: Date,
-  invoiceValue: { type: Number }, // New field
+  invoiceValue: { type: Number },
   transporterDetails: String,
   docketNo: String,
   transporterContactDetails: String,
   plannedDeliveryDate: Date,
   actualDeliveryDate: Date,
-  deliveryAcknowledgement: String, // New field
+  deliveryAcknowledgement: String,
   installationPlannedDate: Date,
   actualInstallationDate: Date,
   installationDoneBy: String,
   serialNo: String,
   installationReportNo: String,
-  buybackCollected: { type: String, enum: ["YES", "NO", "PARTIALLY COLLECTED", ""] }, // Updated field
-  buybackCollectedDate: Date, // Updated field name
+  buybackCollected: { type: String, enum: ["YES", "NO", "PARTIALLY COLLECTED", ""] },
+  buybackCollectedDate: Date,
   buybackDetailsWithQty: String,
-  buybackSendToHoOrDisposedLocally: { type: String, enum: ["SENT_TO_HO", "DISPOSED_LOCALLY", ""] }, // New field
-  localDisposalDetails: String, // New field
+  buybackSendToHoOrDisposedLocally: { type: String, enum: ["SENT_TO_HO", "DISPOSED_LOCALLY", ""] },
+  localDisposalDetails: String,
   paymentStatus: { type: String, enum: ["COMPLETED", "PENDING", "PARTIAL RECEIVED", ""] },
   lastPaymentReceivedDate: Date,
   paymentAmount: Number,
@@ -58,6 +69,18 @@ const OrderSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   updatedBy: String,
   updatedAt: Date,
+
+  // Products array
+  products: [ProductSchema],
+});
+
+// Add timestamps for created and updated
+OrderSchema.pre('save', function(next) {
+  if (this.isNew) {
+    this.createdAt = new Date();
+  }
+  this.updatedAt = new Date();
+  next();
 });
 
 export default mongoose.models.Order || mongoose.model("Order", OrderSchema);

@@ -129,6 +129,39 @@
   color: #1e40af;
 }
 
+.productsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 16px;
+}
+
+.productCard {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.productCard h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #374151;
+}
+
+.productCard p {
+  margin: 6px 0;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.productCard strong {
+  color: #374151;
+  font-weight: 500;
+}
+
 @media (max-width: 640px) {
   .viewContainer {
     padding: 16px;
