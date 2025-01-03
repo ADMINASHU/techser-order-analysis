@@ -69,15 +69,16 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData }) => {
   });
 
   const handleAddProduct = () => {
-  
-
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      products: [...prev.products, {
-        ...productForm,
-        // Add any additional product metadata
-        addedAt: new Date(),
-      }]
+      products: [
+        ...prev.products,
+        {
+          ...productForm,
+          // Add any additional product metadata
+          addedAt: new Date(),
+        },
+      ],
     }));
 
     // Reset product form
@@ -104,18 +105,18 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData }) => {
   useEffect(() => {
     if (initialData && Object.keys(initialData).length > 0) {
       const formattedData = Object.keys(initialData).reduce((acc, key) => {
-        if (key === 'products') {
+        if (key === "products") {
           // Safely handle products array
           acc[key] = Array.isArray(initialData[key]) ? initialData[key] : [];
         } else if (initialData[key] === null || initialData[key] === undefined) {
           // Handle null/undefined values
-          acc[key] = '';
-        } else if (key.toLowerCase().includes('date') && initialData[key]) {
+          acc[key] = "";
+        } else if (key.toLowerCase().includes("date") && initialData[key]) {
           // Handle date fields
           try {
-            acc[key] = new Date(initialData[key]).toISOString().split('T')[0];
+            acc[key] = new Date(initialData[key]).toISOString().split("T")[0];
           } catch (e) {
-            acc[key] = '';
+            acc[key] = "";
           }
         } else {
           // Handle all other fields
@@ -124,9 +125,9 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData }) => {
         return acc;
       }, {});
 
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        ...formattedData
+        ...formattedData,
       }));
     }
   }, [initialData]);
@@ -230,11 +231,13 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData }) => {
                   <strong>Quantity:</strong> {product.quantity}
                 </p>
 
-                <p>
-                  <strong>Warranty:</strong>{" "}
-                  {new Date(product.warrantyStartDate).toLocaleDateString()} to{" "}
-                  {new Date(product.warrantyEndDate).toLocaleDateString()}
-                </p>
+                {product.productType === "ORDERED" && (
+                  <p>
+                    <strong>Warranty:</strong>{" "}
+                    {new Date(product.warrantyStartDate).toLocaleDateString()} to{" "}
+                    {new Date(product.warrantyEndDate).toLocaleDateString()}
+                  </p>
+                )}
               </div>
               <button
                 type="button"
@@ -305,19 +308,25 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData }) => {
               />
             </div>
 
-            <div className={styles.formGroup}>
-              <label>Rating/AH</label>
-              <input
-                type="text"
-                value={productForm.rating}
-                onChange={(e) =>
-                  setProductForm((prev) => ({
-                    ...prev,
-                    rating: e.target.value,
-                  }))
-                }
-              />
-            </div>
+            {!(
+              productForm.productCategory === "RACK" || productForm.productCategory === "OTHERS"
+            ) && (
+              <div className={styles.formGroup}>
+                <label>
+                  {productForm.productCategory === "BATTERY" ? "Capacity (AH)" : "Rating (KVA)"}
+                </label>
+                <input
+                  type="text"
+                  value={productForm.rating}
+                  onChange={(e) =>
+                    setProductForm((prev) => ({
+                      ...prev,
+                      rating: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            )}
 
             <div className={styles.formGroup}>
               <label>Quantity</label>
@@ -332,35 +341,42 @@ const DashForm = ({ department, level, isAdmin, onClose, initialData }) => {
                 }
               />
             </div>
-          
-                <div className={styles.formGroup}>
-                  <label>Warranty Start Date</label>
-                  <input
-                    type="date"
-                    value={productForm.warrantyStartDate}
-                    onChange={(e) =>
-                      setProductForm((prev) => ({
-                        ...prev,
-                        warrantyStartDate: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
 
-                <div className={styles.formGroup}>
-                  <label>Warranty End Date</label>
-                  <input
-                    type="date"
-                    value={productForm.warrantyEndDate}
-                    onChange={(e) =>
-                      setProductForm((prev) => ({
-                        ...prev,
-                        warrantyEndDate: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-         
+            {/* Add conditional rendering for warranty fields */}
+            {productForm.productType === "ORDERED" &&
+              !(
+                productForm.productCategory === "RACK" || productForm.productCategory === "OTHERS"
+              ) && (
+                <>
+                  <div className={styles.formGroup}>
+                    <label>Warranty Start Date</label>
+                    <input
+                      type="date"
+                      value={productForm.warrantyStartDate}
+                      onChange={(e) =>
+                        setProductForm((prev) => ({
+                          ...prev,
+                          warrantyStartDate: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label>Warranty End Date</label>
+                    <input
+                      type="date"
+                      value={productForm.warrantyEndDate}
+                      onChange={(e) =>
+                        setProductForm((prev) => ({
+                          ...prev,
+                          warrantyEndDate: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </>
+              )}
 
             <div className={styles.productFormButtons}>
               <button
